@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string.h>
 #include <unistd.h>
+#include <cstdio>
 
 using namespace std;
 #define memcpy_s(dst,dst_size,src,max_count)  memcpy(dst,src,max_count)
