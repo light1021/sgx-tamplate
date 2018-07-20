@@ -42,12 +42,20 @@ enclave {
             const uint8_t* sealed_log, size_t sealed_log_size);
         public int ecall_update_sealed_policy([in,out, size=sealed_log_size]
             uint8_t* sealed_log, size_t sealed_log_size);
+        public int ecall_get_left_times([in,out, size=sealed_log_size]
+            uint8_t* sealed_log, size_t sealed_log_size, [out] uint64_t * left_times);
         public int ecall_delete_sealed_policy([in, size=sealed_log_size]
             const uint8_t* sealed_log, size_t sealed_log_size);
         public int ecall_create_time_based_policy([out, size=sealed_log_size]
             uint8_t* sealed_log, size_t sealed_log_size, uint32_t lease_duration);
         public int ecall_perform_time_based_policy([in, size=sealed_log_size]
             const uint8_t* sealed_log, size_t sealed_log_size );
+        public int ecall_get_left_time([in, size=sealed_log_size]
+            const uint8_t* sealed_log, size_t sealed_log_size, [out] uint64_t *left_time);
+    };
+
+    untrusted {
+        void ocall_print_string([in, string] const char *str);
     };
 
 };

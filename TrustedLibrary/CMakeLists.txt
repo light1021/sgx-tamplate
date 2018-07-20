@@ -11,13 +11,13 @@ ELSEIF(${SGX_MODE} STREQUAL "HW")
 ENDIF(${SGX_MODE} STREQUAL "SIM")
 
 
-ADD_CUSTOM_COMMAND(OUTPUT Enclave_u.h Enclave_u.c
+ADD_CUSTOM_COMMAND(OUTPUT DrmEnclave_u.h DrmEnclave_u.c
    COMMAND ${SGX_EDGER8R} --untrusted ${PROJECT_SOURCE_DIR}/Enclave/DrmEnclave.edl --search-path ${PROJECT_SOURCE_DIR}/Enclave --search-path ${SGX_SDK}/include
    COMMENT "make ucode"
 )
 ADD_CUSTOM_TARGET(
    ucode ALL
-   DEPENDS Enclave_u.h Enclave_u.c
+   DEPENDS DrmEnclave_u.h DrmEnclave_u.c
 )
 
 FILE(GLOB_RECURSE DRM_Cpp_Files "../DRM/*.cpp")
@@ -36,7 +36,7 @@ LINK_DIRECTORIES("/usr/lib")    #注意，不可信部分链接的库不再${SDK
 # TARGET_LINK_LIBRARIES(app ${Urts_Library_Name} pthread ${Uservice_Library_Name}) 
 # 可执行文件需要的库，注意链接库的先后顺序，有的库需要依赖前面的库函数，如果顺序错误，可能会报错，说找不到相应函数
 
-ADD_LIBRARY(trustenclave SHARED ${Library_Cpp_Files} ${DRM_Cpp_Files} ${PROJECT_SOURCE_DIR}/build/TrustedLibrary/DrmEnclave_u.c)#生成libenclave.so
+ADD_LIBRARY(Drm SHARED ${Library_Cpp_Files} ${DRM_Cpp_Files} ${PROJECT_SOURCE_DIR}/build/TrustedLibrary/DrmEnclave_u.c)#生成libenclave.so
 #ADD_LIBRARY(enclave SHARED Enclave.cpp TrustedLibrary/Libcxx.cpp TrustedLibrary/seal.cpp ../build/Enclave_t.c)#生成libenclave.so
 
-TARGET_LINK_LIBRARIES(trustenclave ${Urts_Library_Name} pthread ${Uservice_Library_Name})#链接libenclave.so需要的库
+TARGET_LINK_LIBRARIES(Drm ${Urts_Library_Name} pthread ${Uservice_Library_Name})#链接libenclave.so需要的库

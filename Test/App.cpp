@@ -13,6 +13,7 @@ uint32_t test_replay_protected_drm_update_limitation()
 {
     cout<<endl<<"--------> Replay Protected DRM update limitation:"<<endl;
     uint32_t result = 0;
+    uint64_t left_times;
     ReplayProtectedDRM DRM;
     result = DRM.init(3);
     if(result)
@@ -26,6 +27,8 @@ uint32_t test_replay_protected_drm_update_limitation()
         for (int i = 0; i <= REPLAY_PROTECTED_PAY_LOAD_MAX_RELEASE_VERSION; i++)
         {
             result = DRM.update_secret();
+            DRM.get_left_times(&left_times);
+            cout << "times left: "<< left_times << endl;
             if(result == MAX_RELEASE_REACHED)
             {
                 cout<<"\tExpected failure."<<endl
@@ -67,6 +70,7 @@ uint32_t test_time_based_policy_operation()
         cout<<"Successfully initialized the time based policy."<<endl;
 
     result = DRM.perform_function();
+    
     if(result)
     {
         cerr<<"Performing the time based policy functions failed."<<endl;
@@ -81,8 +85,11 @@ uint32_t test_time_based_policy_expiration()
 {
     cout<<endl<<"--------> Time based policy expiration:"<<endl;
     TimeBasedDRM DRM;
+    uint64_t time_left;
     uint32_t result = 0;
     result = DRM.init(3);
+    DRM.get_left_time(&time_left);
+    cout << "time left: " << time_left << endl;
     if(result)
     {
         cerr<<"Initialization the time based policy failed."<<endl;
@@ -92,6 +99,18 @@ uint32_t test_time_based_policy_expiration()
         cout<<"Successfully initialized the time based policy."<<endl;
 
     /* wait for time based DRM expiring */
+    Sleep(1000);
+    result = DRM.perform_function();
+    DRM.get_left_time(&time_left);
+    cout << "time left: " << time_left << endl;
+    if(result)
+    {
+        cerr<<"Initialization the time based policy failed."<<endl;
+        return result;
+    }
+    else
+        cout<<"Successfully initialized the time based policy."<<endl;
+
     Sleep((TIME_BASED_LEASE_DURATION_SECOND+1)*1000);
     result = DRM.perform_function();
 

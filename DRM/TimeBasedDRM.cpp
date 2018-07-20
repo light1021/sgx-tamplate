@@ -53,3 +53,15 @@ uint32_t TimeBasedDRM::perform_function()
 {
     return perform_function(time_based_policy);
 }
+
+
+uint32_t TimeBasedDRM::get_left_time(uint8_t* stored_time_based_policy, uint64_t *left_time){
+    int ret = 0;
+
+    ret = trust_sgx_get_left_time(enclave_id, (uint8_t *)time_based_policy, time_based_policy_length, left_time);
+    
+    return ret;
+}
+uint32_t TimeBasedDRM::get_left_time(uint64_t *left_time){
+    return get_left_time(time_based_policy, left_time);
+}

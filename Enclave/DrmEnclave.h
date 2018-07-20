@@ -54,4 +54,14 @@ typedef struct _replay_protected_pay_load
 }replay_protected_pay_load;
 
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+void printf(const char *fmt, ...);
+
+#if defined(__cplusplus)
+}
+#endif
+
 #endif /* !_ENCLAVE_H_ */

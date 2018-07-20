@@ -83,6 +83,21 @@ int trust_sgx_update_sealed_policy(sgx_enclave_id_t eid, uint8_t* sealed_log, si
     return ret;
 }
 
+int trust_sgx_get_left_times(sgx_enclave_id_t eid, uint8_t *sealed_log, size_t sealed_log_size, uint64_t *left_times){
+    int ret = 0;
+
+    sgx_status_t sgx_ret = SGX_ERROR_UNEXPECTED;
+
+    sgx_ret = ecall_get_left_times(eid, &ret, sealed_log, sealed_log_size, left_times);
+    if (sgx_ret)
+    {
+        cerr<<"call update_sealed_policy fail, error code = 0x"<< hex<< sgx_ret
+            <<endl;
+        return sgx_ret;
+    } 
+    return ret;
+}
+
 int trust_sgx_delete_sealed_policy(sgx_enclave_id_t eid, uint8_t* sealed_log, size_t sealed_log_size){
     int ret = 0;
 
@@ -162,4 +177,21 @@ int trust_sgx_perform_time_based_policy(sgx_enclave_id_t eid, const uint8_t* sea
     }
 
     return ret;
+}
+
+
+int trust_sgx_get_left_time(sgx_enclave_id_t eid, const uint8_t* sealed_log, size_t sealed_log_size, uint64_t *left_time){
+    int ret = 0;
+
+    sgx_status_t sgx_ret = SGX_ERROR_UNEXPECTED;
+    uint32_t enclave_ret = 0;
+    sgx_ret = ecall_get_left_time(eid, &ret, sealed_log, sealed_log_size, left_time);
+    if (sgx_ret)
+    {
+        cerr<<"call perform_time_based_policy fail, error code = 0x"<< hex<<
+            sgx_ret <<endl;
+        return sgx_ret;
+    }
+
+    return ret;   
 }

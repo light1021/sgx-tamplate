@@ -1,10 +1,21 @@
 #include "DrmEnclave.h"
+#include <stdio.h>
+void printf(const char *fmt, ...)
+{
+	char buf[BUFSIZ] = {'\0'};
+	va_list ap;
+	va_start(ap, fmt);
+	vsnprintf(buf, BUFSIZ, fmt, ap);
+	va_end(ap);
+	ocall_print_string(buf);
+}
 
 static int verify_mc(replay_protected_pay_load* data2verify)
 {
     int ret = 0;
     uint32_t mc_value;
     ret = sgx_read_monotonic_counter(&data2verify->mc,&mc_value);
+    //printf("verify_mc:%d\n", ret);
     if(ret != SGX_SUCCESS)
     {
         switch(ret)
@@ -292,7 +303,48 @@ int ecall_update_sealed_policy(uint8_t* sealed_log, size_t sealed_log_size)
     return ret;
 }
 
+int ecall_get_left_times(uint8_t* sealed_log, size_t sealed_log_size, uint64_t *left_times){
+    int ret = 0;
+    int busy_retry_times = 2;
+    replay_protected_pay_load data_unsealed;
+    replay_protected_pay_load data2seal;
+    if(sealed_log_size != sgx_calc_sealed_data_size(0,
+        sizeof(replay_protected_pay_load))) 
+        return SGX_ERROR_INVALID_PARAMETER;
+    do{
+        ret = sgx_create_pse_session();
+    }while (ret == SGX_ERROR_BUSY && busy_retry_times--);
+    if (ret != SGX_SUCCESS)
+        return ret;
 
+    do
+    {
+        ret = verify_sealed_data((sgx_sealed_data_t*) sealed_log,
+            &data_unsealed);
+        if(ret != SGX_SUCCESS)
+            break;
+
+        memcpy(&data2seal,&data_unsealed, sizeof(replay_protected_pay_load));
+
+
+        uint64_t tmp = data2seal.log.max_release_version - data2seal.log.release_version;
+        memcpy(left_times, &tmp, sizeof(uint64_t));
+
+        /* seal the new log */
+        sgx_seal_data(0, NULL, sizeof(data2seal), (uint8_t*)&data2seal,
+            sealed_log_size, (sgx_sealed_data_t*)sealed_log);
+    } while (0);
+
+    /* remember to clear secret data after been used by memset_s */
+    memset_s(&data_unsealed, sizeof(replay_protected_pay_load), 0,
+        sizeof(replay_protected_pay_load));
+
+    /* remember to clear secret data after been used by memset_s */
+    memset_s(&data2seal, sizeof(replay_protected_pay_load), 0,
+        sizeof(replay_protected_pay_load));
+    sgx_close_pse_session();
+    return ret;
+}
 
 int ecall_delete_sealed_policy(const uint8_t* sealed_log,
                               size_t sealed_log_size)
@@ -526,6 +578,125 @@ int ecall_perform_time_based_policy(const uint8_t* sealed_log,
             ret = LEASE_EXPIRED;
             break;
         }
+    }while(0);
+    if (SGX_SUCCESS == ret)
+    {
+      /* release the secret to render service, for example, decrypt the DRM
+      content*/
+    }
+    else
+    {
+      /* The secret is not released. the service won't be rendered and the DRM
+      content can be deleted.*/ 
+    }
+    /* clear the plaintext secret after used */
+    memset_s(&unsealed_data, sizeof(unsealed_data), 0,
+        sizeof(time_based_pay_load));
+    sgx_close_pse_session();
+    return ret;
+}
+
+
+int ecall_get_left_time(const uint8_t* sealed_log,
+                                   size_t sealed_log_size,
+                                   uint64_t *left_time)
+{
+    int ret = 0;
+    int busy_retry_times = 2;
+    time_based_pay_load unsealed_data;
+    uint32_t data2seal_length = sizeof(time_based_pay_load);
+
+    int size = sgx_calc_sealed_data_size(0,sizeof(time_based_pay_load));
+    if(sealed_log_size != size) 
+        return SGX_ERROR_INVALID_PARAMETER;
+
+
+    ret = sgx_unseal_data((const sgx_sealed_data_t*)sealed_log, NULL, 0,
+        (uint8_t*)&unsealed_data, &data2seal_length);
+    if(ret != SGX_SUCCESS)
+    {
+        switch(ret)
+        {
+        case SGX_ERROR_MAC_MISMATCH:
+            /* MAC of the sealed data is incorrect. the sealed data has been
+            tampered.*/
+            break;
+        case SGX_ERROR_INVALID_ATTRIBUTE:
+            /*Indicates attribute field of the sealed data is incorrect.*/
+            break;
+        case SGX_ERROR_INVALID_ISVSVN:
+            /* Indicates isv_svn field of the sealed data is greater than the
+            enclave's ISVSVN. This is a downgraded enclave.*/
+            break;
+        case SGX_ERROR_INVALID_CPUSVN:
+            /* Indicates cpu_svn field of the sealed data is greater than the
+            platform's cpu_svn. enclave is  on a downgraded platform.*/
+            break;
+        case SGX_ERROR_INVALID_KEYNAME:
+            /*Indicates key_name field of the sealed data is incorrect.*/
+            break;
+        default:
+            /*other errors*/
+            break;
+        }
+        return ret;
+    }
+    do{
+        ret = sgx_create_pse_session();
+    }while (ret == SGX_ERROR_BUSY && busy_retry_times--);
+    if (ret != SGX_SUCCESS)
+    {
+        memset_s(&unsealed_data, sizeof(unsealed_data), 0, 
+            sizeof(time_based_pay_load));
+        return ret;
+    }
+    do
+    {
+        sgx_time_source_nonce_t nonce = {0};
+        sgx_time_t current_timestamp;
+        ret = sgx_get_trusted_time(&current_timestamp, &nonce);
+        if(ret != SGX_SUCCESS)
+        {
+            switch(ret)
+            {
+            case SGX_ERROR_SERVICE_UNAVAILABLE:
+                /* Architecture Enclave Service Manager is not installed or not
+                working properly.*/
+                break;
+            case SGX_ERROR_SERVICE_TIMEOUT:
+                /* retry the operation*/
+                break;
+            case SGX_ERROR_BUSY:
+                /* retry the operation later*/
+                break;
+            default:
+                /*other errors*/
+                break;
+            }
+            break;
+        }
+        /*source nonce must be the same, otherwise time source is changed and
+        the two timestamps are not comparable.*/
+        if (memcmp(&nonce,&unsealed_data.nonce,
+            sizeof(sgx_time_source_nonce_t)))
+        {
+            ret  = TIMESOURCE_CHANGED;
+            break;
+        }
+
+        /* This should not happen. 
+        SGX Platform service guarantees that the time stamp reading moves
+        forward, unless the time source is changed.*/
+        if(current_timestamp < unsealed_data.timestamp_base)
+        {
+            ret = TIMESTAMP_UNEXPECTED;
+            break;
+        }
+        /*compare lease_duration and timestamp_diff
+        if lease_duration is less than difference of current time and base time,
+        lease tern has expired.*/
+        uint64_t tmp = unsealed_data.timestamp_base + unsealed_data.lease_duration - current_timestamp;
+        memcpy(left_time, &tmp, sizeof(uint64_t));
     }while(0);
     if (SGX_SUCCESS == ret)
     {

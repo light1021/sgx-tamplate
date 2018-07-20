@@ -16,6 +16,8 @@ public:
     uint32_t perform_function(uint8_t* stored_time_based_policy);
 
     uint32_t get_time_based_policy(uint8_t* stored_time_based_policy);
+    uint32_t get_left_time(uint8_t* stored_time_based_policy, uint64_t *left_time);
+    uint32_t get_left_time(uint64_t *left_time);
 
     static const uint32_t time_based_policy_length = TIME_BASED_PAY_LOAD_SIZE;
 private:

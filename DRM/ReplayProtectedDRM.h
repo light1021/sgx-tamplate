@@ -17,6 +17,8 @@ public:
     // uint32_t perform_function(uint8_t* stored_sealed_activity_log);
     uint32_t update_secret();
     uint32_t update_secret(uint8_t* stored_sealed_activity_log);
+    uint32_t get_left_times(uint64_t *left_times);
+    uint32_t get_left_times(uint8_t* stored_sealed_activity_log, uint64_t *left_times);
 
     // uint32_t delete_secret();
     // uint32_t delete_secret(uint8_t* stored_sealed_activity_log);

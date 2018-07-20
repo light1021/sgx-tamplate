@@ -86,3 +86,13 @@ uint32_t ReplayProtectedDRM::update_secret()
 // {
 //     return delete_secret(sealed_activity_log);
 // }
+
+uint32_t ReplayProtectedDRM::get_left_times(uint8_t* stored_sealed_activity_log, uint64_t *left_times){
+    int ret = 0;
+    ret = trust_sgx_get_left_times(enclave_id, (uint8_t *)stored_sealed_activity_log, sealed_activity_log_length, left_times);
+    return ret;
+}
+
+uint32_t ReplayProtectedDRM::get_left_times(uint64_t *left_times){
+    return get_left_times(sealed_activity_log, left_times);
+}
