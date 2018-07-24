@@ -696,6 +696,7 @@ int ecall_get_left_time(const uint8_t* sealed_log,
         if lease_duration is less than difference of current time and base time,
         lease tern has expired.*/
         uint64_t tmp = unsealed_data.timestamp_base + unsealed_data.lease_duration - current_timestamp;
+        printf("get left time: --> current_timestap: %d\n", current_timestamp);
         memcpy(left_time, &tmp, sizeof(uint64_t));
     }while(0);
     if (SGX_SUCCESS == ret)

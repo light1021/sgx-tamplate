@@ -27,7 +27,7 @@ uint32_t TimeBasedDRM:: init(uint8_t*  stored_time_based_policy, uint32_t lease_
 {
     int ret = 0;
 
-    ret = trust_sgx_create_time_based_policy(enclave_id, (uint8_t *)time_based_policy, time_based_policy_length, lease_duration);
+    ret = trust_sgx_create_time_based_policy(enclave_id, (uint8_t *)stored_time_based_policy, time_based_policy_length, lease_duration);
 
     return ret;
 }
@@ -58,7 +58,7 @@ uint32_t TimeBasedDRM::perform_function()
 uint32_t TimeBasedDRM::get_left_time(uint8_t* stored_time_based_policy, uint64_t *left_time){
     int ret = 0;
 
-    ret = trust_sgx_get_left_time(enclave_id, (uint8_t *)time_based_policy, time_based_policy_length, left_time);
+    ret = trust_sgx_get_left_time(enclave_id, stored_time_based_policy, time_based_policy_length, left_time);
     
     return ret;
 }
