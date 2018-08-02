@@ -327,7 +327,8 @@ int ecall_get_left_times(uint8_t* sealed_log, size_t sealed_log_size, uint64_t *
         memcpy(&data2seal,&data_unsealed, sizeof(replay_protected_pay_load));
 
 
-        uint64_t tmp = data2seal.log.max_release_version - data2seal.log.release_version;
+        uint64_t tmp = (data2seal.log.max_release_version > data2seal.log.release_version)? 
+        data2seal.log.max_release_version - data2seal.log.release_version : 0;
         memcpy(left_times, &tmp, sizeof(uint64_t));
 
         /* seal the new log */
@@ -695,7 +696,8 @@ int ecall_get_left_time(const uint8_t* sealed_log,
         /*compare lease_duration and timestamp_diff
         if lease_duration is less than difference of current time and base time,
         lease tern has expired.*/
-        uint64_t tmp = unsealed_data.timestamp_base + unsealed_data.lease_duration - current_timestamp;
+        uint64_t tmp = (unsealed_data.timestamp_base + unsealed_data.lease_duration > current_timestamp)
+         ? unsealed_data.timestamp_base + unsealed_data.lease_duration - current_timestamp : 0;
         printf("get left time: --> current_timestap: %d\n", current_timestamp);
         memcpy(left_time, &tmp, sizeof(uint64_t));
     }while(0);
