@@ -1,0 +1,7 @@
+# Hashes of file build rules.
+3ad78f4bf65cd60732564559dd0994e9 Enclave/CMakeFiles/sign
+3ad78f4bf65cd60732564559dd0994e9 Enclave/CMakeFiles/tcode
+c72214aa4bf4c1375a0acfa2358cb088 Enclave/Enclave.signed.so
+f881fef163e4ea73014e93638cb8eecf Enclave/Enclave_t.h
+e7c456a0599bbf26eb865baa622d805c TrustedLibrary/CMakeFiles/ucode
+f05d7cf01f5db0ec423cf1e6230fa167 TrustedLibrary/Enclave_u.h

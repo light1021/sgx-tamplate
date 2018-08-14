@@ -1,0 +1,14 @@
+/home/ywl/Documents/sgx-template/build/CMakeFiles/rebuild_cache.dir
+/home/ywl/Documents/sgx-template/build/CMakeFiles/edit_cache.dir
+/home/ywl/Documents/sgx-template/build/TrustedLibrary/CMakeFiles/rebuild_cache.dir
+/home/ywl/Documents/sgx-template/build/TrustedLibrary/CMakeFiles/edit_cache.dir
+/home/ywl/Documents/sgx-template/build/TrustedLibrary/CMakeFiles/ucode.dir
+/home/ywl/Documents/sgx-template/build/TrustedLibrary/CMakeFiles/EnclaveApp.dir
+/home/ywl/Documents/sgx-template/build/Enclave/CMakeFiles/rebuild_cache.dir
+/home/ywl/Documents/sgx-template/build/Enclave/CMakeFiles/edit_cache.dir
+/home/ywl/Documents/sgx-template/build/Enclave/CMakeFiles/sign.dir
+/home/ywl/Documents/sgx-template/build/Enclave/CMakeFiles/tcode.dir
+/home/ywl/Documents/sgx-template/build/Enclave/CMakeFiles/Enclave.dir
+/home/ywl/Documents/sgx-template/build/Test/CMakeFiles/rebuild_cache.dir
+/home/ywl/Documents/sgx-template/build/Test/CMakeFiles/app.dir
+/home/ywl/Documents/sgx-template/build/Test/CMakeFiles/edit_cache.dir

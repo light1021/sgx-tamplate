@@ -1,0 +1,46 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ywl/Documents/sgx-template/build/TrustedLibrary/Enclave_u.c
+Enclave_u.h
+/home/ywl/Documents/sgx-template/build/TrustedLibrary/Enclave_u.h
+errno.h
+-
+
+/home/ywl/Documents/sgx-template/build/TrustedLibrary/Enclave_u.h
+stdint.h
+-
+wchar.h
+-
+stddef.h
+-
+string.h
+-
+sgx_edger8r.h
+/home/ywl/Documents/sgx-template/build/TrustedLibrary/sgx_edger8r.h
+stdlib.h
+-
+
+/opt/intel/sgxsdk/include/sgx_defs.h
+
+/opt/intel/sgxsdk/include/sgx_edger8r.h
+sgx_defs.h
+/opt/intel/sgxsdk/include/sgx_defs.h
+sgx_error.h
+/opt/intel/sgxsdk/include/sgx_error.h
+sgx_eid.h
+/opt/intel/sgxsdk/include/sgx_eid.h
+stddef.h
+-
+
+/opt/intel/sgxsdk/include/sgx_eid.h
+stdint.h
+-
+
+/opt/intel/sgxsdk/include/sgx_error.h
+
